@@ -1,2 +1,5 @@
 # ignore videos
 videos/
+# ignore frames
+results/*/frames
+results/*/*/frames

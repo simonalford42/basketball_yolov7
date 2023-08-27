@@ -3,3 +3,4 @@
 videos/
 # ignore results
 results/
+yolov7-w6-pose.pt

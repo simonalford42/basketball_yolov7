@@ -560,7 +560,7 @@ def create_split_folder(path, splits, shot_duration, fps=10):
     return path
 
 
-def calculate_inconsistency(path):
+def calculate_consistency(path):
     keypoints = load_keypoints(path)
     # if there are no keypoints, just copy the last frame's keypoints
     keypoints2 = []
@@ -574,7 +574,28 @@ def calculate_inconsistency(path):
     _, n_frames = load_splits(path)
     # [n_shots, n_frames, n_keypoints, 2]
     keypoints = np.array([keypoints[i:i+n_frames] for i in range(0, len(keypoints), n_frames)])
-    n_shots, n_frames, n_keypoints, _ = keypoints.shape
+
+    consistency = calculate_consistency_from_keypoints(keypoints)
+
+    # save plain text to file 'consistency.txt'
+    with open(f'results/{path}/consistency.txt', 'w') as f:
+        f.write(str(consistency))
+
+    print('Consistency:', consistency)
+
+    return consistency
+
+
+def calculate_consistency_from_keypoints(keypoints):
+    # highest raw gets is about 160-175. we'll make 200 = 0 consistency then.
+    raw_inconsistency = calculate_raw_inconsistency(keypoints)
+    # this way, perfect score is 100
+    consistency = (200 - raw_inconsistency)/2
+    return consistency
+
+
+def calculate_raw_inconsistency(keypoints):
+    n_shots, n_frames, n_keypoints, two = keypoints.shape
 
     # translate based off the first keypoint in the first frame of each shot
     keypoints = keypoints - keypoints[:, 0:1, 0:1, :]
@@ -591,11 +612,6 @@ def calculate_inconsistency(path):
     shot_std = np.std(keypoints, axis=0, ddof=1).sum(axis=-1)
     assert shot_std.shape == (n_frames, 17)
     inconsistency = 100 * shot_std.mean()
-    print('inconsistency: ' + str(inconsistency))
-    # save plain text to file 'inconsistency.txt'
-    with open(f'results/{path}/inconsistency.txt', 'w') as f:
-        f.write(str(inconsistency))
-
     return inconsistency
 
 
@@ -611,6 +627,29 @@ def process_splits(path, predicted_splits):
     # delete the frames subdirectory
     os.system(f'rm -r results/{split_path}/frames')
     return split_path
+
+
+def estimate_perfect_inconsistency():
+    for i in list(range(100)):
+        random_keypoints = np.random.rand(i, 10, 17, 2) * np.array([640, 480])[None, None, None, :]
+        raw_inconsistency = calculate_raw_inconsistency(random_keypoints)
+        print(raw_inconsistency)
+
+
+def estimate_perfect_consistency():
+    # check that we can achieve 100 consistency
+    path = 'curry_full_court_5fps/10fps_split_0'
+    keypoints = load_keypoints(path)
+    _, n_frames = load_splits(path)
+    # [n_shots, n_frames, n_keypoints, 2]
+    keypoints = np.array([keypoints[i:i+n_frames] for i in range(0, len(keypoints), n_frames)])
+    # modify so that it's the same shot repeated over and over again
+    keypoints = keypoints[0:1].repeat(10, axis=0)
+    assert keypoints.shape == (10, n_frames, 17, 2)
+
+    consistency = calculate_consistency_from_keypoints(keypoints)
+    print(f'{consistency=}')
+    assert False
 
 
 if __name__ == '__main__':
@@ -638,12 +677,11 @@ if __name__ == '__main__':
         'flips': ('flips_5fps', 17, 5),
     }
 
-    path, first_shot_ix, n_shots = info['flips']
+    # path, first_shot_ix, n_shots = info['flips']
     predicted_splits = detect_splits(path, first_shot_ix, window_duration=2,
                                      n_shots=n_shots, plot=True)
 
     split_path = process_splits(path, predicted_splits)
+    # split_path = path + '/10fps_split_0'
 
-    split_path = f'{path}/10fps_split_0'
-
-    inconsistency = calculate_inconsistency(split_path)
+    calculate_consistency(split_path)

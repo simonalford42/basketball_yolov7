@@ -2,25 +2,25 @@
 
 First clone with submodules installed:
 
- git clone --recurse-submodules https://github.com/simonalford42/abstraction
+ `git clone --recurse-submodules https://github.com/simonalford42/abstraction`
 
 If you've already cloned, try
 
-git submodule update --init --recursive
+ `git submodule update --init --recursive`
 
 to get the submodules added.
 
 Then install the requirements:
 
- pip install -r requirements.txt
+ `pip install -r requirements.txt`
 
 and
  
- pip install -r yolov7/requirements.txt  
+ `pip install -r yolov7/requirements.txt`
 
 Lastly, download the yolov7 pose estimation model: 
 
- curl -L https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7-w6-pose.pt -o yolov7-w6-pose.pt
+ `curl -L https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7-w6-pose.pt -o yolov7-w6-pose.pt`
 
 # Usage
 This is a tool to estimate shooting form consistency. The steps are

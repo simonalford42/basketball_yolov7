@@ -211,7 +211,7 @@ def process_images_and_save_outputs(path, frames=None):
         os.mkdir(out_path)
 
     for ix, i in tqdm(enumerate(range(0, len(images), BATCH_SIZE))):
-        output = run_batch_inference(images[i:i+BATCH_SIZE])
+        output = run_inference(images[i:i+BATCH_SIZE])
         with open(f'{out_path}/batch_{ix}.pkl', 'wb') as f:
             pickle.dump(output, f)
         del output
@@ -377,6 +377,7 @@ def detect_splits(path, first_shot_ix, window_duration=1, n_shots=None, plot=Fal
     predicted_split_ixs = [first_shot_ix] + predicted_split_ixs
     # convert to frame numbers
     predicted_splits = [frame_nums[ix] for ix in predicted_split_ixs]
+    print('predicted splits:', predicted_splits)
 
     return predicted_splits
 
@@ -413,6 +414,7 @@ def local_minima(arr, n=None, plot=False):
             # print(i, steepness(i))
 
     if plot:
+        plt.clf()
         plt.plot(arr)
         # put a red dot at each predicted min (false pos)
         plt.scatter(local_minima[:pred_n], arr[local_minima[:pred_n]], c='r')
@@ -545,11 +547,7 @@ def create_split_folder(path, splits, shot_duration, fps=10):
     with open(f'results/{path}/splits.txt', 'w') as f:
         f.write(str((splits, num_frames)))
 
-    if i > 0:
-        # just copy the frames from the other folder
-        os.system(f'cp -r results/{path[:-2]}_0/frames results/{path}/frames')
-    else:
-        extract_frames(path)
+    extract_frames(path)
 
     print('created split folder at', 'results/' + path)
     return path
@@ -612,8 +610,6 @@ def calculate_raw_inconsistency(keypoints):
 
 def process_splits(path, predicted_splits):
     split_path = create_split_folder(path, predicted_splits, shot_duration=2, fps=10)
-    print(f'{split_path=}')
-
     frames = get_frames_in_windows(split_path)
     process_images_and_save_outputs(split_path, frames)
     process_saved_outputs_to_keypoints(split_path)
@@ -648,17 +644,17 @@ def estimate_perfect_consistency():
 
 
 if __name__ == '__main__':
-    name = 'flips'
-    download_video('https://www.youtube.com/watch?v=PfOcDtfZkO0', f'videos/{name}.mp4')
-    path = create_folder(f'videos/{name}.mp4', fps=5)
+    # name = 'guy.mp4'
+    # download_video('https://www.youtube.com/watch?v=PfOcDtfZkO0', f'videos/{name}.mp4')
+    path = create_folder(f'videos/{name}', fps=5)
     extract_frames(path)
     process_images_and_save_outputs(path)
     process_saved_outputs_to_keypoints(path)
     save_annotated_frames(path)
     create_mp4(path)
     first_shot_ix = int(input('input frame index where first shot starts:'))
-    # n_shots = int(input('input number of shots:'))
-    n_shots = None
+    n_shots = int(input('input number of shots:'))
+    # n_shots = None
 
     info = {
         'guy': ('guy_5fps', 9, 3),
@@ -672,7 +668,7 @@ if __name__ == '__main__':
         'flips': ('flips_5fps', 17, 5),
     }
 
-    # path, first_shot_ix, n_shots = info['flips']
+    path, first_shot_ix, n_shots = info[name]
     predicted_splits = detect_splits(path, first_shot_ix, window_duration=2,
                                      n_shots=n_shots, plot=True)
 

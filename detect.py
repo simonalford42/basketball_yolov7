@@ -66,12 +66,7 @@ def load_image(url):
     return image
 
 
-def run_inference(image):
-    output, _ = MODEL(image.unsqueeze(0)) # torch.Size([1, large num, 57])
-    return output
-
-
-def run_batch_inference(images):
+def run_inference(images):
     output, _ = MODEL(torch.stack(images)) # torch.Size([N, large num, 57])
     return output
 
@@ -289,6 +284,7 @@ def keypoint_distance(keypoints1, keypoints2, translate=True):
 
     return sum([dist(p1, p2) for p1, p2 in zip(keypoints1, keypoints2)])
 
+
 def next_unused_path(path, extend_fn=lambda i: f'_{i}', return_i=False, start_zero=False):
     if '.' in path:
         last_dot = path.rindex('.')
@@ -410,7 +406,6 @@ def local_minima(arr, n=None, plot=False):
         minima = local_minima[:pred_n]
     else:
         minima = local_minima[:n]
-
 
     # for each false negative, print the steepness
     # if n is not None and pred_n < n:

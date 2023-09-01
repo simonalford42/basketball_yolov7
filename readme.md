@@ -31,4 +31,4 @@ This is a tool to estimate shooting form consistency. The consistency score is g
 Some notes:
 - It takes time and memory to run yolov7 on the images of the video. If needed, the batch size can be decreased to reduce memory burden.
 - When prompted, input the first frame where the first shot begins. Looking at the created annotated frames folder is useful for this.
-- It is optional to provide the number of shots in the video. If no number is provided, the detecter will attempt to estimate the number of shots based on the cyclical change in pose.
+- It is optional to provide the number of shots in the video. If no number is provided, the detector will attempt to estimate the number of shots based on the cyclical change in pose.

@@ -2,7 +2,7 @@
 
 First clone with submodules installed:
 
- `git clone --recurse-submodules https://github.com/simonalford42/basketball_yolov6.git`
+ `git clone --recurse-submodules https://github.com/simonalford42/basketball_yolov7.git`
 
 If you've already cloned, try
 

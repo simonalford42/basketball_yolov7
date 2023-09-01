@@ -2,7 +2,7 @@
 
 First clone with submodules installed:
 
- `git clone --recurse-submodules https://github.com/simonalford42/abstraction`
+ `git clone --recurse-submodules https://github.com/simonalford42/basketball_yolov6.git`
 
 If you've already cloned, try
 
@@ -23,7 +23,7 @@ Lastly, download the yolov7 pose estimation model:
  `curl -L https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7-w6-pose.pt -o yolov7-w6-pose.pt`
 
 # Usage
-This is a tool to estimate shooting form consistency. The consistency score is given out of 100. Perfect consistency i s100, and perfect inconsistency is 0. In theory, worse than zero is also possible. The steps are
+This is a tool to estimate shooting form consistency. The consistency score is given out of 100. Perfect consistency is 100, and perfect inconsistency is 0. In theory, worse than zero is also possible. The steps are
 1. Pass in a video
 2. Indicate the first frame of the first shot, and optionally the number of shots taken.
 3. Receive an estimate of shooting consistency.
